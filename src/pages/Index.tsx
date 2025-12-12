@@ -1,12 +1,70 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState } from 'react';
+import { BottomNav } from '@/components/BottomNav';
+import { HomeView } from '@/components/views/HomeView';
+import { WorkoutView } from '@/components/views/WorkoutView';
+import { ProgressView } from '@/components/views/ProgressView';
+import { ProfileView } from '@/components/views/ProfileView';
+import { useFitnessStore } from '@/hooks/useFitnessStore';
+import { Toaster } from '@/components/ui/toaster';
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState('home');
+  const {
+    profile,
+    setProfile,
+    weightHistory,
+    addWeightEntry,
+    workouts,
+    workoutLogs,
+    logWorkout,
+    calculateBMI,
+    getStrengthProgress,
+  } = useFitnessStore();
+
+  const renderView = () => {
+    switch (activeTab) {
+      case 'home':
+        return (
+          <HomeView
+            profile={profile}
+            weightHistory={weightHistory}
+            calculateBMI={calculateBMI}
+          />
+        );
+      case 'workout':
+        return (
+          <WorkoutView
+            workouts={workouts}
+            onLogWorkout={logWorkout}
+          />
+        );
+      case 'progress':
+        return (
+          <ProgressView
+            strengthProgress={getStrengthProgress()}
+            workoutLogs={workoutLogs}
+          />
+        );
+      case 'profile':
+        return (
+          <ProfileView
+            profile={profile}
+            onUpdateProfile={setProfile}
+            onAddWeight={addWeightEntry}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="mb-4 text-4xl font-bold">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <main className="container max-w-md mx-auto px-4 pt-6">
+        {renderView()}
+      </main>
+      <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />
+      <Toaster />
     </div>
   );
 };
