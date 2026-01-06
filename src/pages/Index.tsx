@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { BottomNav } from '@/components/BottomNav';
 import { HomeView } from '@/components/views/HomeView';
-import { WorkoutView } from '@/components/views/WorkoutView';
+import { TrainView } from '@/components/views/TrainView';
 import { ProgressView } from '@/components/views/ProgressView';
+import { TeamView } from '@/components/views/TeamView';
 import { ProfileView } from '@/components/views/ProfileView';
 import { useFitnessStore } from '@/hooks/useFitnessStore';
 import { Toaster } from '@/components/ui/toaster';
@@ -31,9 +32,9 @@ const Index = () => {
             calculateBMI={calculateBMI}
           />
         );
-      case 'workout':
+      case 'train':
         return (
-          <WorkoutView
+          <TrainView
             workouts={workouts}
             onLogWorkout={logWorkout}
           />
@@ -45,6 +46,8 @@ const Index = () => {
             workoutLogs={workoutLogs}
           />
         );
+      case 'team':
+        return <TeamView />;
       case 'profile':
         return (
           <ProfileView

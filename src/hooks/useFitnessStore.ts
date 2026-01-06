@@ -66,6 +66,8 @@ const defaultProfile: UserProfile = {
   level: 5,
   xp: 2450,
   streak: 12,
+  preferredModality: 'strength',
+  weeklyGoal: 5,
 };
 
 const generateWeightHistory = (): WeightEntry[] => {
