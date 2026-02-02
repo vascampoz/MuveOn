@@ -1,5 +1,23 @@
 import { useState } from 'react';
-import { ArrowLeft, Coffee, Check, Trophy, Plus } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Coffee, 
+  Trophy, 
+  Plus, 
+  Dumbbell, 
+  Heart, 
+  Zap, 
+  Waypoints, 
+  Moon, 
+  Waves,
+  Bike,
+  Footprints,
+  Dribbble,
+  CircleDot,
+  Target,
+  Activity,
+  Swords
+} from 'lucide-react';
 import { ModalitySelector } from '@/components/ModalitySelector';
 import { SessionTimer } from '@/components/SessionTimer';
 import { WorkoutCard } from '@/components/WorkoutCard';
@@ -13,6 +31,7 @@ import { SwimmingWorkout, RunningWorkout } from '@/types/sports';
 import { Button } from '@/components/ui/button';
 import { toast } from '@/hooks/use-toast';
 import { useSportsStore } from '@/hooks/useSportsStore';
+import { getModalityConfig } from '@/lib/modalities';
 
 interface TrainViewProps {
   workouts: Workout[];
@@ -20,6 +39,15 @@ interface TrainViewProps {
 }
 
 type ViewMode = 'select' | 'modality' | 'session' | 'detail';
+
+// Icon mapping for other sports
+const otherSportsIcons: { name: string; icon: React.ReactNode }[] = [
+  { name: 'Futebol', icon: <Dribbble className="w-6 h-6" /> },
+  { name: 'Basquete', icon: <CircleDot className="w-6 h-6" /> },
+  { name: 'Tênis', icon: <Target className="w-6 h-6" /> },
+  { name: 'Vôlei', icon: <Activity className="w-6 h-6" /> },
+  { name: 'Artes Marciais', icon: <Swords className="w-6 h-6" /> },
+];
 
 export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('select');
@@ -70,7 +98,7 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
     onLogWorkout(selectedWorkout.letter, exercises);
     
     toast({
-      title: "Treino Concluído! 🎉",
+      title: "Treino Concluído!",
       description: `+50 XP ganhos pelo treino ${selectedWorkout.letter}`,
     });
 
@@ -80,7 +108,7 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
   const handleRestDay = () => {
     onLogWorkout('REST', []);
     toast({
-      title: "Dia de Descanso ☕",
+      title: "Dia de Descanso",
       description: "Descanse bem para o próximo treino!",
     });
   };
@@ -108,7 +136,7 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
     });
 
     toast({
-      title: "Natação Concluída! 🏊",
+      title: "Natação Concluída!",
       description: `+60 XP • ${selectedSwimmingWorkout.totalDistance}m em ${data.totalTime}min`,
     });
 
@@ -131,7 +159,7 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
     });
 
     toast({
-      title: "Corrida Concluída! 🏃",
+      title: "Corrida Concluída!",
       description: `+60 XP • ${selectedRunningWorkout.totalDistance}km em ${data.totalTime}min`,
     });
 
@@ -140,6 +168,19 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
 
   const completedCount = Array.from(exerciseData.values()).filter(e => e.completed).length;
   const totalExercises = selectedWorkout?.exercises.length || 0;
+
+  // Get modality icon component
+  const getModalityIcon = (modality: Modality) => {
+    const icons: Record<Modality, React.ReactNode> = {
+      strength: <Dumbbell className="w-5 h-5" />,
+      cardio: <Heart className="w-5 h-5" />,
+      hiit: <Zap className="w-5 h-5" />,
+      mobility: <Waypoints className="w-5 h-5" />,
+      recovery: <Moon className="w-5 h-5" />,
+      sports: <Trophy className="w-5 h-5" />,
+    };
+    return icons[modality];
+  };
 
   // HIIT Protocol options
   const hiitProtocols: { id: HIITProtocol; name: string; work: number; rest: number; rounds: number }[] = [
@@ -207,7 +248,7 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
           rounds={protocol.rounds}
           onComplete={(totalTime) => {
             toast({
-              title: "HIIT Concluído! 🔥",
+              title: "HIIT Concluído!",
               description: `+75 XP • ${Math.floor(totalTime / 60)} minutos de treino intenso`,
             });
             resetView();
@@ -274,6 +315,9 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
 
   // Render Modality Content
   if (viewMode === 'modality') {
+    const modalityConfig = getModalityConfig(selectedModality);
+    const ModalityIcon = modalityConfig.icon;
+    
     return (
       <div className="space-y-6 pb-24 animate-slide-up">
         <div className="flex items-center gap-4">
@@ -283,14 +327,12 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="text-xl font-bold font-display text-foreground">
-            {selectedModality === 'strength' && '🏋️ Musculação'}
-            {selectedModality === 'cardio' && '🏃 Cardio'}
-            {selectedModality === 'hiit' && '⚡ HIIT'}
-            {selectedModality === 'mobility' && '🧘 Mobilidade'}
-            {selectedModality === 'recovery' && '💆 Recuperação'}
-            {selectedModality === 'sports' && '🏊 Esportes'}
-          </h1>
+          <div className="flex items-center gap-2">
+            <ModalityIcon className="w-5 h-5 text-primary" />
+            <h1 className="text-xl font-bold font-display text-foreground">
+              {modalityConfig.name}
+            </h1>
+          </div>
         </div>
 
         {selectedModality === 'strength' && (
@@ -321,7 +363,7 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
                 className="w-full glass-card p-4 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02]"
               >
                 <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
-                  <span className="text-2xl">⚡</span>
+                  <Zap className="w-6 h-6 text-accent" />
                 </div>
                 <div className="flex-1 text-left">
                   <h3 className="font-semibold text-foreground">{protocol.name}</h3>
@@ -372,9 +414,11 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
 
             {(selectedSport === 'cycling' || selectedSport === 'walking' || selectedSport === 'other') && (
               <div className="glass-card p-6 text-center">
-                <span className="text-5xl mb-4 block">
-                  {selectedSport === 'cycling' ? '🚴' : selectedSport === 'walking' ? '🚶' : '⚽'}
-                </span>
+                <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                  {selectedSport === 'cycling' && <Bike className="w-8 h-8 text-muted-foreground" />}
+                  {selectedSport === 'walking' && <Footprints className="w-8 h-8 text-muted-foreground" />}
+                  {selectedSport === 'other' && <Trophy className="w-8 h-8 text-muted-foreground" />}
+                </div>
                 <h3 className="font-semibold text-foreground mb-2">Em breve</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Treinos de {selectedSport === 'cycling' ? 'ciclismo' : selectedSport === 'walking' ? 'caminhada' : 'outros esportes'} estarão disponíveis em breve!
@@ -426,9 +470,10 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
 
             {(selectedSport === 'cycling' || selectedSport === 'walking') && (
               <div className="glass-card p-6 text-center">
-                <span className="text-5xl mb-4 block">
-                  {selectedSport === 'cycling' ? '🚴' : '🚶'}
-                </span>
+                <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+                  {selectedSport === 'cycling' && <Bike className="w-8 h-8 text-muted-foreground" />}
+                  {selectedSport === 'walking' && <Footprints className="w-8 h-8 text-muted-foreground" />}
+                </div>
                 <h3 className="font-semibold text-foreground mb-2">Em breve</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Treinos estruturados estarão disponíveis em breve!
@@ -439,22 +484,22 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
             {selectedSport === 'other' && (
               <div className="space-y-3">
                 <h3 className="text-sm font-medium text-muted-foreground">Outros Esportes</h3>
-                {['⚽ Futebol', '🏀 Basquete', '🎾 Tênis', '🏐 Vôlei', '🥋 Artes Marciais'].map((sport) => (
+                {otherSportsIcons.map((sport) => (
                   <button
-                    key={sport}
+                    key={sport.name}
                     className="w-full glass-card p-4 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02]"
                     onClick={() => {
                       toast({
-                        title: "Sessão registrada! ⚽",
+                        title: "Sessão registrada!",
                         description: "+40 XP • Atividade esportiva",
                       });
                     }}
                   >
-                    <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center">
-                      <span className="text-2xl">{sport.split(' ')[0]}</span>
+                    <div className="w-12 h-12 rounded-xl bg-warning/20 flex items-center justify-center text-warning">
+                      {sport.icon}
                     </div>
                     <div className="flex-1 text-left">
-                      <h3 className="font-semibold text-foreground">{sport.split(' ')[1]}</h3>
+                      <h3 className="font-semibold text-foreground">{sport.name}</h3>
                       <p className="text-sm text-muted-foreground">Registrar sessão</p>
                     </div>
                   </button>
@@ -466,9 +511,13 @@ export function TrainView({ workouts, onLogWorkout }: TrainViewProps) {
 
         {(selectedModality === 'mobility' || selectedModality === 'recovery') && (
           <div className="glass-card p-6 text-center">
-            <span className="text-5xl mb-4 block">
-              {selectedModality === 'mobility' ? '🧘' : '💆'}
-            </span>
+            <div className="w-16 h-16 rounded-full bg-muted/50 flex items-center justify-center mx-auto mb-4">
+              {selectedModality === 'mobility' ? (
+                <Waypoints className="w-8 h-8 text-success" />
+              ) : (
+                <Moon className="w-8 h-8 text-muted-foreground" />
+              )}
+            </div>
             <h3 className="font-semibold text-foreground mb-2">
               {selectedModality === 'mobility' ? 'Rotinas de Mobilidade' : 'Check-in de Recuperação'}
             </h3>
