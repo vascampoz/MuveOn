@@ -1,4 +1,4 @@
-import { ChevronRight, Timer, MapPin } from 'lucide-react';
+import { ChevronRight, Timer, MapPin, PersonStanding } from 'lucide-react';
 import { RunningWorkout } from '@/types/sports';
 import { cn } from '@/lib/utils';
 
@@ -35,7 +35,7 @@ export function RunningWorkoutCard({ workout, onClick }: RunningWorkoutCardProps
       className="w-full glass-card p-4 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02]"
     >
       <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
-        <span className="text-2xl">🏃</span>
+        <PersonStanding className="w-6 h-6 text-accent" />
       </div>
       <div className="flex-1 text-left">
         <h3 className="font-semibold text-foreground">{workout.name}</h3>
