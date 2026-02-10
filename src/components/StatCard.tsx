@@ -1,47 +1,85 @@
-import { LucideIcon } from 'lucide-react';
+/**
+ * Componente de exemplo: StatCard
+ * Exibe estatísticas com Design Tokens
+ * Segue o padrão: Sem HTML, apenas React Native
+ */
+
+import { View, Text, StyleSheet } from 'react-native';
+import { theme } from '@/constants/theme';
+import { LucideIcon } from 'lucide-react-native';
 
 interface StatCardProps {
   icon: LucideIcon;
   label: string;
   value: string | number;
   unit?: string;
-  trend?: {
-    value: number;
-    positive: boolean;
-  };
-  variant?: 'default' | 'primary' | 'accent';
+  color?: string;
 }
 
-export function StatCard({ icon: Icon, label, value, unit, trend, variant = 'default' }: StatCardProps) {
-  const variantStyles = {
-    default: 'text-foreground',
-    primary: 'text-primary',
-    accent: 'text-accent',
-  };
-
+export function StatCard({
+  icon: Icon,
+  label,
+  value,
+  unit,
+  color = theme.colors.primary,
+}: StatCardProps) {
   return (
-    <div className="stat-card group">
-      <div className="flex items-start justify-between">
-        <div className={`p-2 rounded-xl bg-muted/50 ${variantStyles[variant]}`}>
-          <Icon className="w-5 h-5" />
-        </div>
-        {trend && (
-          <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-            trend.positive 
-              ? 'bg-success/20 text-success' 
-              : 'bg-destructive/20 text-destructive'
-          }`}>
-            {trend.positive ? '+' : ''}{trend.value}%
-          </span>
-        )}
-      </div>
-      <div className="mt-3">
-        <p className="text-muted-foreground text-sm">{label}</p>
-        <p className={`text-2xl font-bold font-display mt-1 ${variantStyles[variant]}`}>
-          {value}
-          {unit && <span className="text-base font-normal text-muted-foreground ml-1">{unit}</span>}
-        </p>
-      </div>
-    </div>
+    <View style={styles.card}>
+      <View style={[styles.iconContainer, { backgroundColor: color }]}>
+        <Icon size={24} color={theme.colors.white} />
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.label}>{label}</Text>
+        <View style={styles.valueContainer}>
+          <Text style={styles.value}>{value}</Text>
+          {unit && <Text style={styles.unit}>{unit}</Text>}
+        </View>
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.md,
+    ...theme.shadows.sm,
+  },
+  iconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: theme.radius.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  content: {
+    flex: 1,
+  },
+  label: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    fontWeight: theme.fontWeight.medium,
+    marginBottom: 4,
+  },
+  valueContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: 4,
+  },
+  value: {
+    fontSize: theme.fontSize.xl,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.text,
+  },
+  unit: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    fontWeight: theme.fontWeight.medium,
+  },
+});
+

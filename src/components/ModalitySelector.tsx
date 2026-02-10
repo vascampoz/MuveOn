@@ -1,62 +1,93 @@
-import { MODALITIES } from '@/lib/modalities';
-import { Modality } from '@/types/fitness';
-import { cn } from '@/lib/utils';
+/**
+ * Componente de exemplo: ModalitySelector
+ * Seletor de modalidades de treino
+ * Demonstra uso de Flexbox (Auto Layout) e Design Tokens
+ */
+
+import { View, Pressable, Text, StyleSheet, ScrollView } from 'react-native';
+import { theme } from '@/constants/theme';
+import { MODALITIES } from '@/lib/constants';
+import * as Icons from 'lucide-react-native';
 
 interface ModalitySelectorProps {
-  selected: Modality;
-  onSelect: (modality: Modality) => void;
-  compact?: boolean;
+  selectedId?: string;
+  onSelect: (id: string) => void;
 }
 
-export function ModalitySelector({ selected, onSelect, compact = false }: ModalitySelectorProps) {
-  if (compact) {
-    return (
-      <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-        {MODALITIES.map((modality) => {
-          const Icon = modality.icon;
-          return (
-            <button
-              key={modality.id}
-              onClick={() => onSelect(modality.id)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-xl whitespace-nowrap transition-all duration-200",
-                selected === modality.id
-                  ? "bg-primary text-primary-foreground scale-105"
-                  : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"
-              )}
-            >
-              <Icon className="w-4 h-4" />
-              <span className="text-sm font-medium">{modality.name}</span>
-            </button>
-          );
-        })}
-      </div>
-    );
-  }
-
+export function ModalitySelector({
+  selectedId,
+  onSelect,
+}: ModalitySelectorProps) {
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <ScrollView
+      horizontal
+      showsHorizontalScrollIndicator={false}
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       {MODALITIES.map((modality) => {
-        const Icon = modality.icon;
+        const isSelected = selectedId === modality.id;
+        // @ts-ignore - Icons dinâmicos
+        const Icon = Icons[modality.icon];
+
         return (
-          <button
+          <Pressable
             key={modality.id}
-            onClick={() => onSelect(modality.id)}
-            className={cn(
-              "glass-card p-4 flex flex-col items-center gap-2 transition-all duration-300",
-              selected === modality.id
-                ? "ring-2 ring-primary ring-offset-2 ring-offset-background scale-[1.02]"
-                : "hover:scale-[1.02] opacity-70 hover:opacity-100"
-            )}
+            style={({ pressed }) => [
+              styles.chip,
+              isSelected && styles.chipSelected,
+              { opacity: pressed ? 0.8 : 1 },
+            ]}
+            onPress={() => onSelect(modality.id)}
           >
-            <Icon className="w-8 h-8" />
-            <span className="font-semibold text-foreground">{modality.name}</span>
-            <span className="text-xs text-muted-foreground text-center">
-              {modality.description}
-            </span>
-          </button>
+            <Icon
+              size={20}
+              color={isSelected ? theme.colors.white : theme.colors.primary}
+            />
+            <Text
+              style={[
+                styles.chipText,
+                isSelected && styles.chipTextSelected,
+              ]}
+            >
+              {modality.label}
+            </Text>
+          </Pressable>
         );
       })}
-    </div>
+    </ScrollView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    marginBottom: theme.spacing.md,
+  },
+  contentContainer: {
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+  },
+  chip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    borderRadius: theme.radius.full,
+    backgroundColor: theme.colors.gray100,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  chipSelected: {
+    backgroundColor: theme.colors.primary,
+    borderColor: theme.colors.primary,
+  },
+  chipText: {
+    fontSize: theme.fontSize.sm,
+    fontWeight: theme.fontWeight.medium,
+    color: theme.colors.primary,
+  },
+  chipTextSelected: {
+    color: theme.colors.white,
+  },
+});

@@ -1,42 +1,99 @@
-import { ChevronRight } from 'lucide-react';
-import { Workout } from '@/types/fitness';
+/**
+ * Componente de exemplo: WorkoutCard
+ * Cartão de treino reutilizável seguindo Design Tokens
+ */
+
+import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { theme } from '@/constants/theme';
+import { Clock, MapPin, Flame } from 'lucide-react-native';
 
 interface WorkoutCardProps {
-  workout: Workout;
-  onClick: () => void;
-  isToday?: boolean;
+  title: string;
+  modality: string;
+  duration: number;
+  distance?: number;
+  calories?: number;
+  onPress?: () => void;
 }
 
-export function WorkoutCard({ workout, onClick, isToday }: WorkoutCardProps) {
-  const badgeColors: Record<string, string> = {
-    A: 'workout-badge-a',
-    B: 'workout-badge-b',
-    C: 'workout-badge-c',
-    D: 'workout-badge-d',
-  };
-
+export function WorkoutCard({
+  title,
+  modality,
+  duration,
+  distance,
+  calories,
+  onPress,
+}: WorkoutCardProps) {
   return (
-    <button
-      onClick={onClick}
-      className={`w-full glass-card p-4 flex items-center gap-4 transition-all duration-300 hover:scale-[1.02] ${
-        isToday ? 'ring-2 ring-primary ring-offset-2 ring-offset-background' : ''
-      }`}
+    <Pressable
+      style={({ pressed }) => [
+        styles.card,
+        { opacity: pressed ? 0.7 : 1 },
+      ]}
+      onPress={onPress}
     >
-      <div className={`workout-badge ${badgeColors[workout.letter]}`}>
-        {workout.letter}
-      </div>
-      <div className="flex-1 text-left">
-        <h3 className="font-semibold text-foreground">{workout.name}</h3>
-        <p className="text-sm text-muted-foreground">
-          {workout.exercises.length} exercícios
-        </p>
-      </div>
-      {isToday && (
-        <span className="text-xs font-medium px-2 py-1 rounded-full bg-primary/20 text-primary">
-          Hoje
-        </span>
-      )}
-      <ChevronRight className="w-5 h-5 text-muted-foreground" />
-    </button>
+      <View style={styles.header}>
+        <Text style={styles.title}>{title}</Text>
+        <Text style={styles.modality}>{modality}</Text>
+      </View>
+
+      <View style={styles.stats}>
+        <View style={styles.stat}>
+          <Clock size={16} color={theme.colors.primary} />
+          <Text style={styles.statText}>{duration}min</Text>
+        </View>
+
+        {distance && (
+          <View style={styles.stat}>
+            <MapPin size={16} color={theme.colors.primary} />
+            <Text style={styles.statText}>{distance.toFixed(2)}km</Text>
+          </View>
+        )}
+
+        {calories && (
+          <View style={styles.stat}>
+            <Flame size={16} color={theme.colors.warning} />
+            <Text style={styles.statText}>{calories}kcal</Text>
+          </View>
+        )}
+      </View>
+    </Pressable>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.radius.lg,
+    padding: theme.spacing.md,
+    marginBottom: theme.spacing.md,
+    ...theme.shadows.md,
+  },
+  header: {
+    marginBottom: theme.spacing.md,
+  },
+  title: {
+    fontSize: theme.fontSize.lg,
+    fontWeight: theme.fontWeight.bold,
+    color: theme.colors.text,
+  },
+  modality: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    marginTop: 4,
+  },
+  stats: {
+    flexDirection: 'row',
+    gap: theme.spacing.lg,
+  },
+  stat: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  statText: {
+    fontSize: theme.fontSize.sm,
+    color: theme.colors.textSecondary,
+    fontWeight: theme.fontWeight.medium,
+  },
+});
